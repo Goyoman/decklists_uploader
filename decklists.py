@@ -24,8 +24,9 @@ class Settings:
 		self.google_sheet_url = google_sheet_url
 
 class Decklist:
-	def __init__(self, player: str, cards: str):
+	def __init__(self, player: str, deck:str, cards: str):
 		self.player = player
+		self.deck = deck
 		self.cards = cards
 
 # Global Variables
@@ -125,6 +126,11 @@ def get_last_name (text:str):
 	end = "First Name:"
 	return find_text_between_two(text, start, end)
 
+def get_deck_name (text:str):
+	start = "Deck Name:"
+	end = "\n"
+	return find_text_between_two(text, start, end)
+
 def get_main_cards (text:str):
 	start = "Main Deck:"
 	end = "Sideboard:"
@@ -134,6 +140,7 @@ def get_main_cards (text:str):
 def get_sideboard_cards (text:str):
 	start = "Sideboard:"
 	end = "Total Number of Cards in Main Deck:"
+	text = find_text_between_two(text, start, end, dotall_pattern = True)
 	return clean_cards_list(text)
 
 def get_pdfs_folder_path_from_input():
@@ -180,15 +187,17 @@ def has_valid_decklist(pdf: str):
 
 	return True
 
+def create_decklist_from_text (text: str):
 	text = replace_html_entities(text)
 	text = replace_unwanted_lines(text)
 	name = get_name(text)
 	name += " "
 	name += get_last_name(text)
-	cards = get_main(text)
+	deck = get_deck_name(text)
+	cards = get_main_cards(text)
 	cards += ("\nSIDEBOARD\n")
-	decklist = Decklist(name, cards)
 	cards += get_sideboard_cards(text)
+	decklist = Decklist(name, deck, cards)
 	decklists.append(decklist)
 #endregion
 
