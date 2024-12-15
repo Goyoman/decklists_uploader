@@ -164,6 +164,7 @@ def get_pdf_files():
 			continue
 		break
 			
+	write_settings_file()
 	return files
 
 def has_valid_decklist(pdf: str):
@@ -193,6 +194,7 @@ def has_valid_decklist(pdf: str):
 
 # Settings
 #region
+def write_settings_file():
 	with open(settings_file_path, 'w') as file:
 		json.dump(vars(settings), file, indent=4)
 #endregion
@@ -210,7 +212,6 @@ def get_google_sheet_url_from_input():
 		else:
 			break
 
-	WriteSettingsToFile()
 	write_settings_file()
 
 def get_google_sheet_url_from_settings():
