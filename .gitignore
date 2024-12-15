@@ -112,6 +112,7 @@ dmypy.json
 # pytype static type analyzer
 .pytype/
 
+.vs/
 env/
 settings.json
 credential.json
