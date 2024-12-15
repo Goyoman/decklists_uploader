@@ -73,10 +73,10 @@ def replace_unwanted_lines (text:str):
 		text = text.replace(unwantedLine, "")
 	return text
 
-def find_text_between_two (text:str, start:str, end:str, includeNewLines:bool = False):
+def find_text_between_two (text:str, start:str, end:str, dotall_pattern:bool = False):
 	pattern = f'(?<={re.escape(start)})(.*?)(?={re.escape(end)})'
 
-	if (includeNewLines):
+	if (dotall_pattern):
 		match = re.search(pattern, text, re.DOTALL)
 	else:
 		match = re.search(pattern, text)
@@ -125,16 +125,15 @@ def get_last_name (text:str):
 	end = "First Name:"
 	return find_text_between_two(text, start, end)
 
-def get_main (text:str):
+def get_main_cards (text:str):
 	start = "Main Deck:"
 	end = "Sideboard:"
-	text = find_text_between_two(text, start, end, includeNewLines = True)
+	text = find_text_between_two(text, start, end, dotall_pattern = True)
 	return clean_cards_list(text)
 
-def get_sideboard (text:str):
+def get_sideboard_cards (text:str):
 	start = "Sideboard:"
 	end = "Total Number of Cards in Main Deck:"
-	text = find_text_between_two(text, start, end, includeNewLines = True)
 	return clean_cards_list(text)
 
 def get_pdfs_folder_path_from_input():
@@ -165,7 +164,6 @@ def get_pdf_files():
 			continue
 		break
 			
-	WriteSettingsToFile()
 	return files
 
 def has_valid_decklist(pdf: str):
@@ -181,7 +179,6 @@ def has_valid_decklist(pdf: str):
 
 	return True
 
-def extract_decklist (text: str):
 	text = replace_html_entities(text)
 	text = replace_unwanted_lines(text)
 	name = get_name(text)
@@ -189,14 +186,13 @@ def extract_decklist (text: str):
 	name += get_last_name(text)
 	cards = get_main(text)
 	cards += ("\nSIDEBOARD\n")
-	cards += get_sideboard(text)
 	decklist = Decklist(name, cards)
+	cards += get_sideboard_cards(text)
 	decklists.append(decklist)
 #endregion
 
 # Settings
 #region
-def WriteSettingsToFile():
 	with open(settings_file_path, 'w') as file:
 		json.dump(vars(settings), file, indent=4)
 #endregion
@@ -215,6 +211,7 @@ def get_google_sheet_url_from_input():
 			break
 
 	WriteSettingsToFile()
+	write_settings_file()
 
 def get_google_sheet_url_from_settings():
 	print(settings.google_sheet_url + "\nDo you want to use this url? (Empty = Yes, Else = No)")
@@ -340,7 +337,6 @@ def log():
 		print("The following files were not uploaded:")
 		print("\n".join(decklists_discarded))
 		input()
-
 #endregion
 
 warnings.filterwarnings("ignore", category=UserWarning, module="PyPDF2")

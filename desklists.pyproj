@@ -11,7 +11,7 @@
     <OutputPath>.</OutputPath>
     <Name>PyMtgDecklists</Name>
     <RootNamespace>PyMtgDecklists</RootNamespace>
-    <InterpreterId>MSBuild|FirstEnv|$(MSBuildProjectFullPath)</InterpreterId>
+    <InterpreterId>MSBuild|env|$(MSBuildProjectFullPath)</InterpreterId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -22,10 +22,10 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Interpreter Include="FirstEnv\">
-      <Id>FirstEnv</Id>
+    <Interpreter Include="env\">
+      <Id>env</Id>
       <Version>3.9</Version>
-      <Description>FirstEnv (Python 3.9 (64-bit))</Description>
+      <Description>env (Python 3.9 (64-bit))</Description>
       <InterpreterPath>Scripts\python.exe</InterpreterPath>
       <WindowsInterpreterPath>Scripts\pythonw.exe</WindowsInterpreterPath>
       <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
@@ -34,6 +34,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="decklists.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="Global|PythonCore|3.13" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
