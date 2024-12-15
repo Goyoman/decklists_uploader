@@ -17,6 +17,7 @@ import datetime
 import warnings
 import glob
 import sys
+import logging
 
 class Settings:
 	def __init__(self, pdfs_folder_path: str = "", google_sheet_url: str = ""):
@@ -312,6 +313,10 @@ def try_connection(url:str):
 
 # MAIN
 #region
+def setup():
+	warnings.filterwarnings("ignore", category=UserWarning, module="PyPDF2")	
+	logging.getLogger("PyPDF2").setLevel(logging.CRITICAL)
+
 def read_settings():
 	if os.path.exists(settings_file_path):
 		with open(settings_file_path) as file:
@@ -349,8 +354,7 @@ def log():
 		input()
 #endregion
 
-warnings.filterwarnings("ignore", category=UserWarning, module="PyPDF2")
-
+setup()
 read_settings()
 read_decklists()
 fill_google_sheet()
