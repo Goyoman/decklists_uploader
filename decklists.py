@@ -283,6 +283,11 @@ def try_filling_google_sheet():
 		print ("DONE!\n")
 	except Exception as e:
 		print (f"An unexpected error ocurred.\n{e}.")
+		input()
+	finally:
+		if (driver):
+			driver.quit()
+
 #endregion
 
 # Web Navigation
@@ -331,21 +336,15 @@ def read_decklists():
 	for file in files:
 		if not (has_valid_decklist(file)):
 			continue
-		text = PdfReader(file).pages[0].extract_text()	
-		extract_decklist(text)
+
+		text = PdfReader(file).pages[0].extract_text()
+		create_decklist_from_text(text)
 	print("DONE!\n")
 
 def fill_google_sheet():
 	print("Preparing to access the Google Sheet...")
-	try:
-		get_google_sheet_url()
-		try_filling_google_sheet()
-	except:
-		input("Asd")
-		exit()
-	finally:
-		if (driver):
-			driver.quit()
+	get_google_sheet_url()
+	try_filling_google_sheet()
 
 def log():
 	if (len(decklists_discarded) > 0):
