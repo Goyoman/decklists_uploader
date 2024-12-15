@@ -24,11 +24,6 @@ class Settings:
 		self.pdfs_folder_path = pdfs_folder_path
 		self.google_sheet_url = google_sheet_url
 
-class Decklist:
-	def __init__(self, player: str, deck:str, cards: str):
-		self.player = player
-		self.deck = deck
-		self.cards = cards
 
 # Global Variables
 #region
@@ -39,7 +34,7 @@ settings = Settings()
 apostrophe_in_html = "&#39;"
 decklist_correct_first_line = "DECK REGISTRATION SHEETTable"
 decklist_unwanted_lines = { "Main Deck Continued:", "# in deck: Card Name:"}
-decklists: list[Decklist] = []
+decklists: list[list[str]] = []
 decklists_discarded: list[str] = []
 driver: webdriver = None
 #endregion
@@ -198,7 +193,7 @@ def create_decklist_from_text (text: str):
 	cards = get_main_cards(text)
 	cards += ("\nSIDEBOARD\n")
 	cards += get_sideboard_cards(text)
-	decklist = Decklist(name, deck, cards)
+	decklist = [name, deck, cards]
 	decklists.append(decklist)
 #endregion
 
@@ -259,27 +254,22 @@ def try_filling_google_sheet():
 		print("Accessing the Google Sheet...")
 		gc = gspread.service_account_from_dict(credential)
 		spreadsheet = gc.open_by_url(settings.google_sheet_url)
-		
-		print("Filling the Google Sheet...")
+
+		print("Creating a new Sheet...")
 		worksheetNames = existing_worksheets = [worksheet.title for worksheet in spreadsheet.worksheets()]
 		worksheetName = get_unique_worksheet_name(worksheetNames)		
 		index = len(spreadsheet.worksheets())
-		worksheet = spreadsheet.add_worksheet(worksheetName, rows=1000, cols=200, index=index)
-		col = 1
-		index = 1
-		total = len(decklists)
-		for decklist in decklists:
-			if (index < total):
-				print(f"Processing decklists {index}/{total}", end='\r')
-			else:
-				print(f"Processing decklists {index}/{total}")
-			worksheet.update_cell(1, col, decklist.player)
-			worksheet.update_cell(2, col, decklist.cards)
-			col += 1
-			index += 1
+		decklists_count = len(decklists)
+		worksheet = spreadsheet.add_worksheet(worksheetName, rows=100, cols=decklists_count, index=index)
 
-		print ("Formatting the Google Sheet...")
+		print ("Formatting the Sheet...")
 		worksheet.format("A:Z", {"verticalAlignment": "TOP"})
+		
+		print("Filling the Sheet...")
+		worksheet.update(list(zip(*decklists)), "A:Z")
+
+		print("Resizing the Sheet...")
+		worksheet.columns_auto_resize(0, decklists_count)
 		print ("DONE!\n")
 	except Exception as e:
 		print (f"An unexpected error ocurred.\n{e}.")
